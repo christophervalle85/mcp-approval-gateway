@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="description" content="An engineering case study by Christopher Valle: deterministic tool policies, human approval, authenticated audit records, and a native macOS isolation prototype.">
+  <title>MCP Approval Gateway · Christopher Valle · Engineering case study</title>
+  <link rel="icon" type="image/svg+xml" href="/showcase-mark.svg">
+  <link rel="stylesheet" href="/showcase.css">
+  <script type="module" src="/showcase.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#cases">Skip to the investigation</a>
+  <header class="site-header">
+    <a class="brand" href="/showcase" aria-label="MCP Approval Gateway, showcase home">
+      <svg class="brand-symbol" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" focusable="false">
+        <rect width="40" height="40" rx="9" fill="#182638"/>
+        <path d="M11 12h7m-7 0v16h7m11-16h-7m7 0v16h-7" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="square"/>
+        <path d="M17 20h6" stroke="#82a9ff" stroke-width="2.5" stroke-linecap="square"/>
+      </svg>
+      <span class="brand-copy"><strong>MCP GATEWAY</strong><span>Engineering case study</span></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation"><span class="menu-lines" aria-hidden="true"></span><span class="menu-label">Menu</span></button>
+    <nav class="primary-nav" id="main-navigation" aria-label="Main navigation">
+      <a href="#overview">Overview</a>
+      <a href="#cases">Cases</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro page-width" id="overview" aria-labelledby="page-title">
+      <div class="intro-copy">
+
+        <h1 id="page-title">MCP Approval<br>Gateway</h1>
+        <p class="project-subtitle">Engineering controls for local AI agents.</p>
+        <p class="lead">I built a local prototype to separate what an AI agent requests from what it is permitted to execute. These cases show where the controls hold, and where their limits begin.</p>
+        <div class="project-links"><a class="intro-link" href="#cases">Explore the cases <span aria-hidden="true">↓</span></a><a class="source-link" href="https://github.com/christophervalle85/mcp-approval-gateway" target="_blank" rel="noopener noreferrer">View source <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="intro-aside" aria-label="Illustrative policy decision">
+        <div class="preview-header"><span>Inside a guarded request</span><span class="preview-status">Illustrative</span></div>
+        <div class="preview-request"><span>Agent requests</span><code>file.read <span>.env</span></code></div>
+        <div class="preview-guard"><span class="preview-node" aria-hidden="true">↓</span><div><strong>Policy guard</strong><span>Checks the request before execution</span></div></div>
+        <div class="preview-decision"><span aria-hidden="true">×</span><div><strong>Read blocked</strong><span>The file adapter never runs</span></div></div>
+      </div>
+    </section>
+
+    <section class="chapter page-width" id="cases" aria-labelledby="cases-title">
+      <div class="chapter-heading">
+
+        <div>
+          <h2 id="cases-title">Follow a request.</h2>
+          <p>Choose a case, then step through the decision.</p>
+        </div>
+      </div>
+
+      <div class="mode-disclosure" role="note">
+        <strong>Illustrative walkthrough</strong>
+        <p id="demo-mode-description">Reconstructed from documented tests. No tools run and no approvals are issued here.</p>
+      </div>
+
+      <div class="case-toolbar">
+        <div class="case-picker-wrap">
+          <label for="case-picker">Choose an investigation</label>
+          <select id="case-picker" disabled>
+            <option value="restricted-file">01 — Sensitive file read</option>
+            <option value="shell-command">02 — Shell execution</option>
+            <option value="human-approval">03 — One-time human approval</option>
+            <option value="path-traversal">04 — Workspace traversal</option>
+            <option value="native-boundary">05 — macOS signed diagnostic</option>
+            <option value="audit-tamper">06 — Audit tampering</option>
+          </select>
+        </div>
+      </div>
+      <noscript><p class="no-js-message">The first case is readable without JavaScript. Enable JavaScript to choose cases and explore individual stages.</p></noscript>
+
+      <article class="case-story" data-kind="policy" aria-labelledby="case-title">
+        <header class="case-heading">
+          <div class="case-overline"><span id="case-number">CASE 01 / 06</span><span class="case-dot" aria-hidden="true"></span><span id="case-category">NODE POLICY GUARD</span></div>
+          <div class="case-title-row"><h3 id="case-title" tabindex="-1">A secret the agent cannot read</h3><span id="case-outcome" class="outcome-pill">BLOCKED</span></div>
+          <p id="case-subtitle">The model requests .env. Policy catches it before the adapter runs.</p>
+        </header>
+
+        <div class="story-content">
+          <div class="story-primary">
+            <section class="story-section request-section" aria-labelledby="request-heading">
+              <div class="story-step-heading"><div><h4 id="request-heading">The request</h4></div></div>
+              <div class="request-code">
+                <div class="request-code-header"><span>Illustrative payload</span></div>
+                <pre><code id="request-payload">{
+  "tool": "file.read",
+  "arguments": { "path": ".env" }
+}</code></pre>
+              </div>
+              <p class="request-explainer" id="request-explainer">This is an illustrative request payload, not an actual file read.</p>
+            </section>
+
+            <section class="story-section evaluation-section" aria-labelledby="evaluation-heading">
+              <div class="story-step-heading"><div><h4 id="evaluation-heading">The decision</h4></div></div>
+              <ol id="scenario-timeline" class="stage-list" aria-label="Stages of the illustrated request">
+                <li><span class="stage-placeholder">Request</span></li>
+                <li><span class="stage-placeholder">Evaluate</span></li>
+                <li><span class="stage-placeholder">Decision</span></li>
+              </ol>
+              <div class="stage-focus">
+                <div class="stage-focus-top"><span id="step-phase">REQUEST</span><span id="step-position">01 / 03</span></div>
+                <h5 id="step-title">The agent asks for a credential file</h5>
+                <p id="step-detail" aria-live="polite" aria-atomic="true">The proposed tool call targets .env in the workspace.</p>
+                <div class="signal-line"><span>STAGE SIGNAL</span><code id="step-signal">file.read · path=.env</code></div>
+              </div>
+              <div class="stage-controls">
+                <button id="previous-step" type="button" class="control control-secondary" disabled>← Previous stage</button>
+                <span id="progress-label" class="stage-counter">1 OF 3 STAGES</span>
+                <button id="next-step" type="button" class="control control-primary">Next stage →</button>
+              </div>
+            </section>
+
+            <section class="story-section outcome-section" aria-labelledby="outcome-heading">
+              <div class="story-step-heading"><div><h4 id="outcome-heading">Outcome</h4></div></div>
+              <div class="outcome-summary" id="outcome-summary">
+                <span class="outcome-signal" id="outcome-label">DENIED BEFORE READ</span>
+                <p id="outcome-explanation">The request never reaches the file adapter, so the requested .env contents are not returned by this routed operation.</p>
+              </div>
+            </section>
+          </div>
+
+          <details class="case-context">
+            <summary>Technical details</summary>
+            <dl class="facts">
+              <div><dt>Tool / diagnostic</dt><dd><code id="case-tool">file.read</code></dd></div>
+              <div><dt>Target</dt><dd><code id="case-target">.env</code></dd></div>
+              <div><dt>Rule / boundary</dt><dd><code id="case-rule">DENY_SENSITIVE_FILE</code></dd></div>
+              <div><dt>Enforcement layer</dt><dd id="case-environment">Node policy guard</dd></div>
+            </dl>
+          </details>
+        </div>
+
+        <section class="case-proof" id="case-proof" aria-labelledby="case-proof-heading">
+          <div class="proof-intro"><div><h4 id="case-proof-heading">Evidence and limits</h4></div></div>
+          <div class="proof-content">
+            <div>
+              <span class="proof-label">EVIDENCE SCOPE</span>
+              <p id="case-evidence">Documented policy test</p>
+              <a id="case-source" class="proof-link" href="https://github.com/christophervalle85/mcp-approval-gateway/blob/main/docs/SECURITY.md" target="_blank" rel="noopener noreferrer">Read supporting documentation <span aria-hidden="true">↗</span></a>
+            </div>
+            <div>
+              <span class="proof-label">WHAT THIS DOES NOT PROVE</span>
+              <p id="case-limitation">The guard applies to routed tool calls; it does not monitor every read made by other processes.</p>
+            </div>
+          </div>
+        </section>
+        <footer class="case-footer">
+          <p id="action-feedback" aria-live="polite" role="status"></p>
+          <button class="footer-action" id="restart-case" type="button">↺ Restart this case</button>
+          <button class="footer-action" id="copy-case-link" type="button">Copy step link</button>
+          <button class="footer-action footer-next" id="next-case" type="button">Next investigation →</button>
+        </footer>
+      </article>
+    </section>
+
+  </main>
+
+  <footer class="site-footer"><span>MCP Approval Gateway · Engineering case study</span><a href="#overview">Back to top ↑</a></footer>
+</body>
+</html>
