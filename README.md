@@ -38,6 +38,10 @@ OLLAMA_MODEL=qwen3:8b npm start # pull that model first
 
 No cloud API key or npm dependency installation is required. The model download is a few gigabytes and needs sufficient memory. Data persists to the gitignored `data/audit.jsonl` file; Ctrl+C stops the server.
 
+## Portfolio case study
+
+With the server running, open [the engineering case study](http://localhost:4317/showcase). Six interactive reconstructions explain policy denials, bounded approval, native isolation, and audit tampering. The case study does not execute tools or grant approvals. The operational dashboard remains at `/`.
+
 ## v0.8: Native macOS security prototype — accepted on my development Mac
 
 **October 19, 2026 status:** I completed on-device acceptance of my **locally installed Apple Development-signed** macOS MCP worker and my separately gated native operator-transfer experiment. This is a **prototype milestone**, not Developer ID/notarized public distribution, a general OS sandbox for Node, or a production security certification. Stable `main` remains v0.7; I am documenting this work on `feature/v0.8-native-transfers`.
